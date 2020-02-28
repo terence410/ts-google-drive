@@ -1,6 +1,9 @@
 name: Testing
 
-on: push
+on:
+  push:
+    branches:
+      - develop
 
 jobs:
   testing:

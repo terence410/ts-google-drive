@@ -97,17 +97,16 @@ async function emptyTrash() {
 
 - Create a Google Cloud Project
 - [Create Service Account](https://console.cloud.google.com/iam-admin/serviceaccounts/create)
-  - Service account details > Choose any service account name > CREATE
-  - Grant this service account access to project > CONTINUE
-  - Grant users access to this service account ( > CREATE KEY
-  - Save the key file into your project
+    - Service account details > Choose any service account name > CREATE
+    - Grant this service account access to project > CONTINUE
+    - Grant users access to this service account ( > CREATE KEY
+    - Save the key file into your project
 - Enable Drive API & Google Sheets API
-  -  [APIs and Services](https://console.cloud.google.com/apis/dashboard) > Enable APIS AND SERVICES 
-  - Search Google Drive API > Enable
-  - Search Google Sheets API > Enable
-- Enable Google Sheets API
-- Open the JSON key file, you will find an email xxx@xxx.iam.gserviceaccount.com. 
-- Go to your Google Spreadsheets and shared the edit permission to the email address.
+    -  [APIs and Services](https://console.cloud.google.com/apis/dashboard) > Enable APIS AND SERVICES 
+    - Search Google Drive API > Enable
+- To access shared folder 
+    - Open the JSON key file, you will find an email xxx@xxx.iam.gserviceaccount.com. 
+    - Go to your Google Drive Folder and shared the edit permission to the email address.
 
 # Links
 - https://www.npmjs.com/package/google-auth-library
