@@ -1,0 +1,42 @@
+{
+  "author": "Terence",
+  "name": "ts-google-drive",
+  "description": "Manage google drive easily. Support create folders, upload files, download files, searching, etc..",
+  "version": "0.0.1",
+  "homepage": "https://github.com/terence410/ts-google-drive",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/terence410/ts-google-drive.git"
+  },
+  "main": "build/index.js",
+  "engines": {
+    "node": ">=6.0"
+  },
+  "scripts": {
+    "test": "mocha --exit --timeout 30000 -r ts-node/register tests/*.ts",
+    "test:coverage": "nyc --reporter=json --reporter=text mocha --exit --timeout 30000 -r ts-node/register tests/*.ts",
+    "npm:patch": "npm version patch",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "google-auth-library": "^5.10.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.3",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.7",
+    "chai": "^4.1.2",
+    "dotenv": "^8.2.0",
+    "mocha": "^4.0.1",
+    "ts-node": "^8.5.0",
+    "typescript": "^3.7.2",
+    "nyc": "^15.0.0"
+  },
+  "keywords": [
+    "google drive",
+    "upload file",
+    "drive api v3",
+    "google cloud"
+  ],
+  "license": "MIT License"
+}

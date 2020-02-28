@@ -1,0 +1,50 @@
+name: Publish To NPM
+
+on:
+  release:
+    types: [published]
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+
+      # we run with npm install instead of npm ci to make sure the package can run with latest packages
+      - name: npm install build and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test:coverage
+        env:
+          CLIENT_EMAIL: ${{secrets.CLIENT_EMAIL }}
+          PRIVATE_KEY: ${{secrets.PRIVATE_KEY }}
+          FOLDER_ID: ${{secrets.FOLDER_ID }}
+
+      - name: Upload code coverage
+        if: env.CODECOV_TOKEN != ''
+        run: |
+          npm install codecov@latest -g
+          mv coverage/coverage-final.json coverage/coverage.json
+          codecov
+
+      - name: Publish to NPM
+        run: |
+          if [ "$NPM_TOKEN" != "" ]; then
+            npm publish
+          else
+            echo "Skip Publish. NPM_TOKEN not exists."
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+

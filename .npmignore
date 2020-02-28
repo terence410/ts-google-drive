@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+.github
+.nyc_output
+coverage
+src
+tests
+tslint.json
+icon.png
