@@ -1,4 +1,4 @@
-import {JWT} from "google-auth-library";
+import {OAuth2Client} from "google-auth-library";
 import {FIELDS, GOOGLE_DRIVE_API} from "./TsGooleDrive";
 import {IUpdateMetaOptions} from "./types";
 
@@ -12,11 +12,11 @@ export class File {
   public size: number = 0;
   public parents: string[] = [];
 
-  constructor(jwt: JWT) {
+  constructor(oAuth2Client: OAuth2Client) {
     // hide it from printing
-    Object.defineProperty(this, "jwt", {
+    Object.defineProperty(this, "oAuth2Client", {
       enumerable: false,
-      value: jwt,
+      value: oAuth2Client,
     });
   }
 
@@ -34,36 +34,36 @@ export class File {
 
   // https://developers.google.com/drive/api/v3/manage-downloads
   public async download(): Promise<Buffer> {
-    const jwt = this._getJWT();
+    const client = this._getClient();
     const url = `/files/${this.id}`;
     const params = {alt: "media"};
 
-    const res = await jwt.request({baseURL: GOOGLE_DRIVE_API, url, params, responseType: "arraybuffer"});
+    const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, params, responseType: "arraybuffer"});
     return Buffer.from(res.data as any);
   }
 
   // https://developers.google.com/drive/api/v3/reference/files/update
   public async update(options: IUpdateMetaOptions = {}) {
-    const jwt = this._getJWT();
+    const client = this._getClient();
     const url = `/files/${this.id}`;
     const params = {fields: FIELDS, addParents: options.parent, description: options.description};
     const body: any = options;
 
-    const res = await jwt.request({baseURL: GOOGLE_DRIVE_API, url, method: "PATCH", params, data: body});
+    const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, method: "PATCH", params, data: body});
     Object.assign(this, res.data);
   }
 
   // https://developers.google.com/drive/api/v3/reference/files/delete
   public async delete() {
-    const jwt = this._getJWT();
+    const client = this._getClient();
     const url = `/files/${this.id}`;
     const params = {};
 
-    const res = await jwt.request({baseURL: GOOGLE_DRIVE_API, url, method: "DELETE", params});
+    const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, method: "DELETE", params});
     return true;
   }
 
-  private _getJWT(): JWT {
-    return (this as any).jwt as JWT;
+  private _getClient(): OAuth2Client {
+    return (this as any).oAuth2Client as OAuth2Client;
   }
 }

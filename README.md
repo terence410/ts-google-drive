@@ -1,4 +1,4 @@
-# Array To Google Sheets #
+# Google Drive API Library #
 
 [![NPM version][npm-image]][npm-url]
 [![Test][github-action-image]][github-action-url]
@@ -35,7 +35,9 @@ const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
 async function getSingleFile() {
     const fileId = "";
     const file = await tsGoogleDrive.getFile(fileId);
-    const isFolder = file.isFolder;
+    if (file) {
+        const isFolder = file.isFolder;
+    } 
 }
 
 async function listFolders() {
@@ -65,7 +67,6 @@ async function createFolder() {
 async function uploadFile() {
     const folderId = "";
     const filename = "./icon.png";
-    const buffer = fs.readFileSync(filename);
     const newFile = await tsGoogleDrive.upload(filename, {parent: folderId});
     const downloadBuffer = await newFile.download();
 }
@@ -79,6 +80,9 @@ async function search() {
         .setPageSize(3)
         .setOrderBy("name")
         .setNameContains("New");
+    
+    // or you can use any query https://developers.google.com/drive/api/v3/search-files
+    query.setQuery("name = 'hello'");
 
     while (query.hasNextPage()) {
         const folders = await query.run();
@@ -93,7 +97,7 @@ async function emptyTrash() {
 }
 ```
 
-# KeyFilename / Service Account
+# Using Service Account
 
 - Create a Google Cloud Project
 - [Create Service Account](https://console.cloud.google.com/iam-admin/serviceaccounts/create)
@@ -101,12 +105,31 @@ async function emptyTrash() {
     - Grant this service account access to project > CONTINUE
     - Grant users access to this service account ( > CREATE KEY
     - Save the key file into your project
-- Enable Drive API & Google Sheets API
+- Enable Drive API
     -  [APIs and Services](https://console.cloud.google.com/apis/dashboard) > Enable APIS AND SERVICES 
     - Search Google Drive API > Enable
 - To access shared folder 
     - Open the JSON key file, you will find an email xxx@xxx.iam.gserviceaccount.com. 
     - Go to your Google Drive Folder and shared the edit permission to the email address.
+- Create using serviceAccount.json
+```typescript
+const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
+```
+- Create using client_email and private_key
+```typescript
+const credentials = {client_email: "", private_key: ""}; // these can be found inside the json file
+const tsGoogleDrive = new TsGooleDrive({credentials});
+```
+
+# Using OAuth
+- How to generate an oauth token is not covered here
+- But you can create one easily via https://developers.google.com/oauthplayground/
+- Select Drive API v3 with scopes "https://www.googleapis.com/auth/drive"
+- Authorize and get the Access token
+- Create using accessToken
+```typescript
+const tsGoogleDrive = new TsGooleDrive({accessToken: ""});
+```
 
 # Links
 - https://www.npmjs.com/package/google-auth-library

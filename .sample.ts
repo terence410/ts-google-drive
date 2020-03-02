@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import {TsGooleDrive} from "./src";
 
 const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
@@ -6,7 +5,9 @@ const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
 async function getSingleFile() {
     const fileId = "";
     const file = await tsGoogleDrive.getFile(fileId);
-    const isFolder = file.isFolder;
+    if (file) {
+        const isFolder = file.isFolder;
+    }
 }
 
 async function listFolders() {
@@ -36,7 +37,6 @@ async function createFolder() {
 async function uploadFile() {
     const folderId = "";
     const filename = "./icon.png";
-    const buffer = fs.readFileSync(filename);
     const newFile = await tsGoogleDrive.upload(filename, {parent: folderId});
     const downloadBuffer = await newFile.download();
 }
@@ -50,6 +50,9 @@ async function search() {
         .setPageSize(3)
         .setOrderBy("name")
         .setNameContains("New");
+
+    // or you can use any query https://developers.google.com/drive/api/v3/search-files
+    query.setQuery("name = 'hello'");
 
     while (query.hasNextPage()) {
         const folders = await query.run();

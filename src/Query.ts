@@ -1,9 +1,8 @@
-import {GoogleAuth, JWT} from "google-auth-library";
+import {GoogleAuth, JWT, OAuth2Client} from "google-auth-library";
 import {File} from "./File";
-import {FIELDS, GOOGLE_DRIVE_API} from "./TsGooleDrive";
+import {FIELDS, GOOGLE_DRIVE_API, TsGoogleDriveOptions} from "./TsGooleDrive";
 
-const googleAuthSymbol = Symbol("googleAuth");
-const jwtSymbol = Symbol("jwt");
+const oAuth2ClientSymbol = Symbol("oAuth2Client");
 type IOperator = "=" | ">" | ">=" | "<" | "<=";
 type orderByKey = "createdTime" |
     "folder" |
@@ -25,11 +24,9 @@ export class Query {
   public orderBy: string[] = [];
 
   private nextPageToken?: string;
-  private [googleAuthSymbol]: GoogleAuth;
-  private [jwtSymbol]: JWT;
+  private [oAuth2ClientSymbol]: OAuth2Client;
 
-  constructor(googleAuth: GoogleAuth) {
-    this[googleAuthSymbol] = googleAuth;
+  constructor(private options: TsGoogleDriveOptions) {
   }
 
   public hasNextPage() {
@@ -81,6 +78,11 @@ export class Query {
     return this;
   }
 
+  public setCreatedTime(operator: IOperator, date: Date) {
+    this.queries.push(`createdTime ${operator} '${date.toISOString()}'`);
+    return this;
+  }
+
   public setQuery(query: string) {
     this.queries.push(query);
     return this;
@@ -108,7 +110,7 @@ export class Query {
       throw new Error("The query has no more next page.");
     }
 
-    const jwt = await this._getJwt();
+    const client = await this._getOAuth2Client();
     const url = `/files`;
     const params = {
       q: this.queries.join(" and "), 
@@ -119,7 +121,7 @@ export class Query {
       orderBy: this.orderBy.join(","),
     };
 
-    const res = await jwt.request({baseURL: GOOGLE_DRIVE_API, url, params});
+    const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, params});
     const result = res.data as any;
 
     // update next page token, we must at least mark it into empty
@@ -129,7 +131,7 @@ export class Query {
     const list: File[] = [];
     if (result.files && Array.isArray(result.files)) {
       for (const item of result.files) {
-        const file = new File(jwt);
+        const file = new File(client);
         Object.assign(file, item);
         list.push(file);
       }
@@ -138,11 +140,18 @@ export class Query {
     return list;
   }
 
-  private async _getJwt() {
-    if (!this[jwtSymbol]) {
-      this[jwtSymbol] = await this[googleAuthSymbol].getClient() as JWT;
+  private async _getOAuth2Client(): Promise<OAuth2Client> {
+    if (!this[oAuth2ClientSymbol]) {
+      if (this.options.accessToken) {
+        const oAuth2Client = new OAuth2Client();
+        oAuth2Client.setCredentials({access_token: this.options.accessToken});
+        this[oAuth2ClientSymbol] = oAuth2Client;
+      } else {
+        const googleAuth = new GoogleAuth(this.options);
+        this[oAuth2ClientSymbol] = await googleAuth.getClient() as OAuth2Client;
+      }
     }
 
-    return this[jwtSymbol];
+    return this[oAuth2ClientSymbol];
   }
 }
