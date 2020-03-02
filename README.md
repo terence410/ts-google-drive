@@ -22,7 +22,7 @@ The library is build with [Google Drive API v3](https://developers.google.com/dr
 - Create Folders
 - Upload Files
 - Download Files (as Buffer)
-- Power file query tools
+- Powerful file query tools
 - Empty Trash
 
 # Usage
