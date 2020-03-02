@@ -14,6 +14,8 @@ const credentials = clientEmail && privateKey ? {client_email: clientEmail, priv
 const tsGoogleDrive = new TsGooleDrive({keyFilename, credentials});
 let testFolderId = "";
 
+const timeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 describe("Testing", () => {
     it("create test folder", async () => {
         const newFolder = await tsGoogleDrive.createFolder({
@@ -25,6 +27,9 @@ describe("Testing", () => {
 
         // assign into testFolderId for further testing
         testFolderId = newFolder.id;
+
+        // wait for a while for the folder to be able to be searched
+        await timeout(3000);
     });
 
     it("get folder", async () => {
@@ -47,7 +52,7 @@ describe("Testing", () => {
         assert.isTrue(newFolder.parents.includes(testFolderId));
 
         // wait for a while for the folder to appear
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await timeout(3000);
 
         // try to search for it
         const foundFolder1 = await tsGoogleDrive
@@ -117,7 +122,7 @@ describe("Testing", () => {
         await Promise.all(promises);
 
         // wait a while first
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await timeout(3000);
 
         const query = await tsGoogleDrive
             .query()
