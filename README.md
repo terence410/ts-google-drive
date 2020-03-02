@@ -27,7 +27,6 @@ The library is build with [Google Drive API v3](https://developers.google.com/dr
 
 # Usage
 ```typescript
-import * as fs from "fs";
 import {TsGooleDrive} from "ts-google-drive";
 
 const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
