@@ -27,9 +27,9 @@ The library is build with [Google Drive API v3](https://developers.google.com/dr
 
 # Usage
 ```typescript
-import {TsGooleDrive} from "ts-google-drive";
+import {TsGoogleDrive} from "ts-google-drive";
 
-const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
+const tsGoogleDrive = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
 
 async function getSingleFile() {
     const fileId = "";
@@ -112,12 +112,12 @@ async function emptyTrash() {
     - Go to your Google Drive Folder and shared the edit permission to the email address.
 - Create using serviceAccount.json
 ```typescript
-const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
+const tsGoogleDrive = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
 ```
 - Create using client_email and private_key
 ```typescript
 const credentials = {client_email: "", private_key: ""}; // these can be found inside the json file
-const tsGoogleDrive = new TsGooleDrive({credentials});
+const tsGoogleDrive = new TsGoogleDrive({credentials});
 ```
 
 # Using OAuth
@@ -127,7 +127,7 @@ const tsGoogleDrive = new TsGooleDrive({credentials});
 - Authorize and get the Access token
 - Create using accessToken
 ```typescript
-const tsGoogleDrive = new TsGooleDrive({accessToken: ""});
+const tsGoogleDrive = new TsGoogleDrive({accessToken: ""});
 ```
 
 # Links

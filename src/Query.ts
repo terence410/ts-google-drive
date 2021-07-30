@@ -1,6 +1,6 @@
 import {GoogleAuth, JWT, OAuth2Client} from "google-auth-library";
 import {File} from "./File";
-import {FIELDS, GOOGLE_DRIVE_API, TsGoogleDriveOptions} from "./TsGooleDrive";
+import {FIELDS, GOOGLE_DRIVE_API, TsGoogleDriveOptions} from "./TsGoogleDrive";
 
 const oAuth2ClientSymbol = Symbol("oAuth2Client");
 type IOperator = "=" | ">" | ">=" | "<" | "<=";

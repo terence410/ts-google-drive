@@ -3,7 +3,7 @@ import {config} from "dotenv";
 config();
 import * as fs from "fs";
 import "mocha";
-import {TsGooleDrive} from "../src/TsGooleDrive";
+import {TsGoogleDrive} from "../src/TsGoogleDrive";
 
 const folderId = process.env.FOLDER_ID || "";
 const keyFilename = process.env.KEY_FILENAME || "";
@@ -11,7 +11,7 @@ const clientEmail = process.env.CLIENT_EMAIL;
 const privateKey = process.env.PRIVATE_KEY;
 const accessToken = process.env.ACCESS_TOKEN;
 const credentials = clientEmail && privateKey ? {client_email: clientEmail, private_key: privateKey} : undefined;
-const tsGoogleDrive = new TsGooleDrive({keyFilename, credentials});
+const tsGoogleDrive = new TsGoogleDrive({keyFilename, credentials});
 let testFolderId = "";
 
 const timeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

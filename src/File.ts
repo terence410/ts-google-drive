@@ -1,5 +1,5 @@
 import {OAuth2Client} from "google-auth-library";
-import {FIELDS, GOOGLE_DRIVE_API} from "./TsGooleDrive";
+import {FIELDS, GOOGLE_DRIVE_API} from "./TsGoogleDrive";
 import {IUpdateMetaOptions} from "./types";
 
 export class File {
