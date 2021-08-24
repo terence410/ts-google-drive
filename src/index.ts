@@ -1,2 +1,2 @@
-import {TsGooleDrive} from "./TsGooleDrive";
-export {TsGooleDrive};
+import {TsGoogleDrive} from "./TsGoogleDrive";
+export {TsGoogleDrive};

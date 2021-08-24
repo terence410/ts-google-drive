@@ -21,7 +21,7 @@ type ISearchFileOptions = {
   inParents?: string | number;
 };
 
-export class TsGooleDrive {
+export class TsGoogleDrive {
   private [oAuth2ClientSymbol]: OAuth2Client;
 
   constructor(private options: TsGoogleDriveOptions) {

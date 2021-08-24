@@ -1,6 +1,6 @@
-import {TsGooleDrive} from "./src";
+import {TsGoogleDrive} from "./src";
 
-const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
+const tsGoogleDrive = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
 
 async function getSingleFile() {
     const fileId = "";
