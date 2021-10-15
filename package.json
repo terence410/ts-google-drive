@@ -2,7 +2,7 @@
   "author": "Terence",
   "name": "ts-google-drive",
   "description": "Manage google drive easily. Support create folders, upload files, download files, searching, etc..",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "homepage": "https://github.com/terence410/ts-google-drive",
   "repository": {
     "type": "git",
