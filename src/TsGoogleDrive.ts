@@ -3,11 +3,14 @@ import * as path from "path";
 import {AuthClientBase} from "./AuthClientBase";
 import {File} from "./File";
 import {Query} from "./Query";
-import {ICreateFolderOptions, ITsGoogleDriveOptions, IUpdateMetaOptions} from "./types";
-
-export const GOOGLE_DRIVE_API = "https://www.googleapis.com/drive/v3";
-export const GOOGLE_DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3/files";
-export const FIELDS = "id,kind,name,mimeType,parents,modifiedTime,createdTime,size";
+import {
+  FILE_FIELDS,
+  GOOGLE_DRIVE_API,
+  GOOGLE_DRIVE_UPLOAD_API,
+  ICreateFolderOptions,
+  ITsGoogleDriveOptions,
+  IUpdateMetaOptions
+} from "./types";
 
 export class TsGoogleDrive extends AuthClientBase {
   constructor(options: ITsGoogleDriveOptions) {
@@ -22,7 +25,7 @@ export class TsGoogleDrive extends AuthClientBase {
   public async getFile(id: string) {
     const client = await this._getClient();
     const url = `/files/${id}`;
-    const params = {fields: FIELDS};
+    const params = {fields: FILE_FIELDS};
 
     try {
       const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, params});
@@ -42,7 +45,7 @@ export class TsGoogleDrive extends AuthClientBase {
   public async createFolder(options: ICreateFolderOptions = {}) {
     const client = await this._getClient();
     const url = `/files`;
-    const params = {fields: FIELDS};
+    const params = {fields: FILE_FIELDS};
     const data: any = {mimeType: "application/vnd.google-apps.folder", name: options.name, description: options.description};
     if (options.parent) {
       data.parents = [options.parent];
@@ -57,7 +60,7 @@ export class TsGoogleDrive extends AuthClientBase {
   // https://developers.google.com/drive/api/v3/reference/files/create
   public async upload(filename: string, options: IUpdateMetaOptions = {}) {
     const client = await this._getClient();
-    const params = {uploadType: "media", fields: FIELDS};
+    const params = {uploadType: "media", fields: FILE_FIELDS};
 
     // upload
     const buffer = fs.readFileSync(filename);

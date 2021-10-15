@@ -1,7 +1,6 @@
 import {BaseExternalAccountClient, OAuth2Client} from "google-auth-library";
 import {AuthClient} from "google-auth-library/build/src/auth/authclient";
-import {FIELDS, GOOGLE_DRIVE_API} from "./TsGoogleDrive";
-import {IUpdateMetaOptions} from "./types";
+import {FILE_FIELDS, GOOGLE_DRIVE_API, IUpdateMetaOptions} from "./types";
 
 export class File {
   public id: string = "";
@@ -58,7 +57,7 @@ export class File {
   public async update(options: IUpdateMetaOptions = {}) {
     const client = this._getClient();
     const url = `/files/${this.id}`;
-    const params = {fields: FIELDS, addParents: options.parent, description: options.description};
+    const params = {fields: FILE_FIELDS, addParents: options.parent, description: options.description};
     const body: any = options;
 
     const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, method: "PATCH", params, data: body});

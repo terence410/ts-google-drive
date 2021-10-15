@@ -3,7 +3,6 @@
 [![NPM version][npm-image]][npm-url]
 [![Test][github-action-image]][github-action-url]
 [![Test coverage][codecov-image]][codecov-url]
-[![David deps][david-image]][david-url]
 
 [npm-image]: https://img.shields.io/npm/v/ts-google-drive.svg
 [npm-url]: https://npmjs.org/package/ts-google-drive

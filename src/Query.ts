@@ -1,9 +1,7 @@
 import {AuthClientBase} from "./AuthClientBase";
 import {File} from "./File";
-import {FIELDS, GOOGLE_DRIVE_API} from "./TsGoogleDrive";
-import {ITsGoogleDriveOptions} from "./types";
+import {FILE_FIELDS, GOOGLE_DRIVE_API, ITsGoogleDriveOptions} from "./types";
 
-const oAuth2ClientSymbol = Symbol("oAuth2Client");
 type IOperator = "=" | ">" | ">=" | "<" | "<=";
 type orderByKey = "createdTime" |
     "folder" |
@@ -118,7 +116,7 @@ export class Query extends AuthClientBase {
       spaces: "drive",
       pageSize: this.pageSize,
       pageToken: this.nextPageToken,
-      fields: `kind,nextPageToken,incompleteSearch,files(${FIELDS})`,
+      fields: `kind,nextPageToken,incompleteSearch,files(${FILE_FIELDS})`,
       orderBy: this.orderBy.join(","),
     };
 
