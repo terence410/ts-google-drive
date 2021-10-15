@@ -1,9 +1,12 @@
-import { assert, expect } from "chai";
+import {Buffer} from "buffer";
 import {config} from "dotenv";
 config();
+
+import { assert, expect } from "chai";
 import * as fs from "fs";
 import "mocha";
 import {TsGoogleDrive} from "../src/TsGoogleDrive";
+import {google} from "googleapis";
 
 const folderId = process.env.FOLDER_ID || "";
 const keyFilename = process.env.KEY_FILENAME || "";
@@ -17,7 +20,8 @@ let testFolderId = "";
 const timeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe("Testing", () => {
-    it("create test folder", async () => {
+    // create test folder
+    before(async () => {
         const newFolder = await tsGoogleDrive.createFolder({
             name: "testing",
             parent: folderId,
@@ -30,6 +34,14 @@ describe("Testing", () => {
 
         // wait for a while for the folder to be able to be searched
         await timeout(3000);
+    });
+
+    // remove test folder
+    after(async () => {
+        const testFolder = await tsGoogleDrive.getFile(testFolderId);
+        if (testFolder) {
+            await testFolder.delete();
+        }
     });
 
     it("get folder", async () => {
@@ -79,6 +91,31 @@ describe("Testing", () => {
         assert.isTrue(newFile.parents.includes(testFolderId));
 
         const downloadBuffer = await newFile.download();
+        assert.deepEqual(buffer, downloadBuffer);
+    });
+
+    it("download with stream", async () => {
+        const filename = "./icon.png";
+        const buffer = fs.readFileSync(filename);
+        const newFile = await tsGoogleDrive.upload(filename, {parent: testFolderId});
+        assert.isDefined(newFile);
+        assert.isTrue(newFile.parents.includes(testFolderId));
+
+        // download by stream
+        const drive = google.drive({version: "v3", auth: newFile.client});
+        const file = await drive.files.get({
+            fileId: newFile.id,
+            alt: 'media'
+        }, {responseType: "stream"});
+
+        let downloadBuffer = Buffer.alloc(0);
+        file.data.on("data", data => {
+            downloadBuffer = Buffer.concat([downloadBuffer, data]);
+        });
+        // wait for it to be completed
+        await new Promise(resolve => file.data.on("end", resolve));
+
+        // check if they are the same
         assert.deepEqual(buffer, downloadBuffer);
     });
 
@@ -149,12 +186,5 @@ describe("Testing", () => {
             .run();
 
         await tsGoogleDrive.emptyTrash();
-    });
-
-    it("remove testing folder", async () => {
-        const testFolder = await tsGoogleDrive.getFile(testFolderId);
-        if (testFolder) {
-            await testFolder.delete();
-        }
     });
 });

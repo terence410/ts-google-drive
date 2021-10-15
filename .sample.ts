@@ -1,6 +1,18 @@
+import * as fs from "fs";
+import {google} from "googleapis";
 import {TsGoogleDrive} from "./src";
 
 const tsGoogleDrive = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
+
+async function auth() {
+    const drive1 = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
+    const drive2 = new TsGoogleDrive({credentials: {client_email: "", private_key: ""}});
+
+    // for steps in getting access_token using oauth, you can take reference below
+    // https://medium.com/@terence410/using-google-oauth-to-access-its-api-nodejs-b2678ade776f
+    const drive3 = new TsGoogleDrive({oAuthCredentials: {access_token: ""}});
+    const drive4 = new TsGoogleDrive({oAuthCredentials: {refresh_token: ""}, oauthClientOptions: {clientId: "", clientSecret: ""}});
+}
 
 async function getSingleFile() {
     const fileId = "";
@@ -34,11 +46,29 @@ async function createFolder() {
         .runOnce();
 }
 
-async function uploadFile() {
+async function uploadAndDownload() {
     const folderId = "";
     const filename = "./icon.png";
     const newFile = await tsGoogleDrive.upload(filename, {parent: folderId});
     const downloadBuffer = await newFile.download();
+
+    // of if you want stream
+    const drive = google.drive({version: "v3", auth: newFile.client});
+    const file = await drive.files.get({
+        fileId: newFile.id,
+        alt: 'media'
+    }, {responseType: "stream"});
+
+    file.data.on("data", data => {
+        // stream data
+    });
+    file.data.on("end", () => {
+        // stream end
+    });
+
+    // or use pipe
+    const writeStream = fs.createWriteStream('./output.png');
+    file.data.pipe(writeStream);
 }
 
 async function search() {

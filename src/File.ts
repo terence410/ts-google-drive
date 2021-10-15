@@ -1,4 +1,5 @@
-import {OAuth2Client} from "google-auth-library";
+import {BaseExternalAccountClient, OAuth2Client} from "google-auth-library";
+import {AuthClient} from "google-auth-library/build/src/auth/authclient";
 import {FIELDS, GOOGLE_DRIVE_API} from "./TsGoogleDrive";
 import {IUpdateMetaOptions} from "./types";
 
@@ -12,11 +13,12 @@ export class File {
   public size: number = 0;
   public parents: string[] = [];
 
-  constructor(oAuth2Client: OAuth2Client) {
-    // hide it from printing
-    Object.defineProperty(this, "oAuth2Client", {
+  constructor(public client: OAuth2Client | BaseExternalAccountClient) {
+    // hide the property from printing
+    Object.defineProperty(this, "client", {
       enumerable: false,
-      value: oAuth2Client,
+      writable: false,
+      value: client,
     });
   }
 
@@ -34,6 +36,16 @@ export class File {
 
   // https://developers.google.com/drive/api/v3/manage-downloads
   public async download(): Promise<Buffer> {
+    const client = this._getClient();
+    const url = `/files/${this.id}`;
+    const params = {alt: "media"};
+
+    const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, params, responseType: "arraybuffer"});
+    return Buffer.from(res.data as any);
+  }
+
+  // https://developers.google.com/drive/api/v3/manage-downloads
+  public async createStream(): Promise<Buffer> {
     const client = this._getClient();
     const url = `/files/${this.id}`;
     const params = {alt: "media"};
@@ -63,7 +75,7 @@ export class File {
     return true;
   }
 
-  private _getClient(): OAuth2Client {
-    return (this as any).oAuth2Client as OAuth2Client;
+  private _getClient(): AuthClient {
+    return this.client;
   }
 }

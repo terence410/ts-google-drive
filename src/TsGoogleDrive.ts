@@ -1,40 +1,21 @@
 import * as fs from "fs";
-import {GoogleAuth, GoogleAuthOptions, OAuth2Client} from "google-auth-library";
 import * as path from "path";
+import {AuthClientBase} from "./AuthClientBase";
 import {File} from "./File";
 import {Query} from "./Query";
-import {ICreateFolderOptions, IUpdateMetaOptions} from "./types";
+import {ICreateFolderOptions, ITsGoogleDriveOptions, IUpdateMetaOptions} from "./types";
 
-const oAuth2ClientSymbol = Symbol("oAuth2Client");
-const SCOPES = "https://www.googleapis.com/auth/drive";
-
-export type TsGoogleDriveOptions = GoogleAuthOptions & {accessToken?: string};
 export const GOOGLE_DRIVE_API = "https://www.googleapis.com/drive/v3";
 export const GOOGLE_DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3/files";
 export const FIELDS = "id,kind,name,mimeType,parents,modifiedTime,createdTime,size";
 
-type ISearchFileOptions = {
-  folderOnly?: boolean;
-  fileOnly?: boolean;
-  nameContains?: string;
-  query?: string;
-  inParents?: string | number;
-};
-
-export class TsGoogleDrive {
-  private [oAuth2ClientSymbol]: OAuth2Client;
-
-  constructor(private options: TsGoogleDriveOptions) {
-    options.scopes = SCOPES;
-
+export class TsGoogleDrive extends AuthClientBase {
+  constructor(options: ITsGoogleDriveOptions) {
+    super(options);
   }
 
   public query() {
     return new Query(this.options);
-  }
-
-  public async testPermissions() {
-    const client = await this._getClient();
   }
 
   // https://developers.google.com/drive/api/v3/reference/files/get
@@ -49,7 +30,7 @@ export class TsGoogleDrive {
       Object.assign(file, res.data);
       return file;
     } catch (err) {
-      if (err.code === 404) {
+      if (typeof err === "object" && (err as any)?.code === 404) {
         return undefined;
       }
 
@@ -102,20 +83,5 @@ export class TsGoogleDrive {
     const params = {};
     const res = await client.request({baseURL: GOOGLE_DRIVE_API, url, method: "DELETE", params});
     return true;
-  }
-
-  private async _getClient(): Promise<OAuth2Client> {
-    if (!this[oAuth2ClientSymbol]) {
-      if (this.options.accessToken) {
-        const oAuth2Client = new OAuth2Client();
-        oAuth2Client.setCredentials({access_token: this.options.accessToken});
-        this[oAuth2ClientSymbol] = oAuth2Client;
-      } else {
-        const googleAuth = new GoogleAuth(this.options);
-        this[oAuth2ClientSymbol] = await googleAuth.getClient() as OAuth2Client;
-      }
-    }
-
-    return this[oAuth2ClientSymbol];
   }
 }

@@ -14,7 +14,7 @@
 [david-image]: https://img.shields.io/david/terence410/ts-google-drive.svg?style=flat-square
 [david-url]: https://david-dm.org/terence410/ts-google-drive
 
-Manage google drive easily. Support create folders, upload files, download files, searching, etc..
+Manage Google Drive easily. Support create folders, upload files, download files, searching, etc..
 The library is build with [Google Drive API v3](https://developers.google.com/drive/api/v3/about-sdk).
 
 # Features
@@ -28,8 +28,17 @@ The library is build with [Google Drive API v3](https://developers.google.com/dr
 # Usage
 ```typescript
 import {TsGooleDrive} from "ts-google-drive";
-
+import {google} from "googleapis";
 const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
+
+async function auth() {
+  const drive1 = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
+  const drive2 = new TsGoogleDrive({credentials: {client_email: "", private_key: ""}});
+
+  // https://www.npmjs.com/package/google-auth-library
+  const drive3 = new TsGoogleDrive({oAuthCredentials: {access_token: ""}});
+  const drive4 = new TsGoogleDrive({oAuthCredentials: {refresh_token: ""}, oauthClientOptions: {clientId: "", clientSecret: ""}});
+}
 
 async function getSingleFile() {
     const fileId = "";
@@ -63,11 +72,30 @@ async function createFolder() {
         .runOnce();
 }
 
-async function uploadFile() {
-    const folderId = "";
-    const filename = "./icon.png";
-    const newFile = await tsGoogleDrive.upload(filename, {parent: folderId});
-    const downloadBuffer = await newFile.download();
+async function uploadAndDownload() {
+  const folderId = "";
+  const filename = "./icon.png";
+  const newFile = await tsGoogleDrive.upload(filename, {parent: folderId});
+  const downloadBuffer = await newFile.download();
+
+  // you have to use "googleapis" package
+  // of if you want stream
+  const drive = google.drive({version: "v3", auth: newFile.client});
+  const file = await drive.files.get({
+    fileId: newFile.id,
+    alt: 'media'
+  }, {responseType: "stream"});
+
+  file.data.on("data", data => {
+    // stream data
+  });
+  file.data.on("end", () => {
+    // stream end
+  });
+
+  // or use pipe
+  const writeStream = fs.createWriteStream('./output.png');
+  file.data.pipe(writeStream);
 }
 
 async function search() {
@@ -112,24 +140,22 @@ async function emptyTrash() {
     - Go to your Google Drive Folder and shared the edit permission to the email address.
 - Create using serviceAccount.json
 ```typescript
-const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
+const drive1 = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
 ```
-- Create using client_email and private_key
+- Create using client_email and private_key (which is available inside the services account JSON)
 ```typescript
-const credentials = {client_email: "", private_key: ""}; // these can be found inside the json file
-const tsGoogleDrive = new TsGooleDrive({credentials});
+const drive2 = new TsGoogleDrive({credentials: {client_email: "", private_key: ""}});
 ```
 
 # Using OAuth
-- How to generate an oauth token is not covered here
-- But you can create one easily via https://developers.google.com/oauthplayground/
-- Select Drive API v3 with scopes "https://www.googleapis.com/auth/drive"
-- Authorize and get the Access token
-- Create using accessToken
+- You can take reference on below link how to grab an oauth access token
+- https://medium.com/@terence410/using-google-oauth-to-access-its-api-nodejs-b2678ade776f
 ```typescript
-const tsGoogleDrive = new TsGooleDrive({accessToken: ""});
+const drive3 = new TsGoogleDrive({oAuthCredentials: {access_token: ""}});
+const drive4 = new TsGoogleDrive({oAuthCredentials: {refresh_token: ""}, oauthClientOptions: {clientId: "", clientSecret: ""}});
 ```
 
 # Links
+- https://www.npmjs.com/package/googleapis
 - https://www.npmjs.com/package/google-auth-library
 - https://developers.google.com/drive

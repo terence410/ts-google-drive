@@ -1,6 +1,7 @@
-import {GoogleAuth, JWT, OAuth2Client} from "google-auth-library";
+import {AuthClientBase} from "./AuthClientBase";
 import {File} from "./File";
-import {FIELDS, GOOGLE_DRIVE_API, TsGoogleDriveOptions} from "./TsGoogleDrive";
+import {FIELDS, GOOGLE_DRIVE_API} from "./TsGoogleDrive";
+import {ITsGoogleDriveOptions} from "./types";
 
 const oAuth2ClientSymbol = Symbol("oAuth2Client");
 type IOperator = "=" | ">" | ">=" | "<" | "<=";
@@ -18,15 +19,15 @@ type orderByKey = "createdTime" |
 
 // https://developers.google.com/drive/api/v3/reference/files/list
 // https://developers.google.com/drive/api/v3/search-files
-export class Query {
+export class Query extends AuthClientBase {
   public queries: string[] = [];
   public pageSize: number = 100;
   public orderBy: string[] = [];
 
   private nextPageToken?: string;
-  private [oAuth2ClientSymbol]: OAuth2Client;
 
-  constructor(private options: TsGoogleDriveOptions) {
+  constructor(options: ITsGoogleDriveOptions) {
+    super(options);
   }
 
   public hasNextPage() {
@@ -110,12 +111,12 @@ export class Query {
       throw new Error("The query has no more next page.");
     }
 
-    const client = await this._getOAuth2Client();
+    const client = await this._getClient();
     const url = `/files`;
     const params = {
-      q: this.queries.join(" and "), 
-      spaces: "drive", 
-      pageSize: this.pageSize, 
+      q: this.queries.join(" and "),
+      spaces: "drive",
+      pageSize: this.pageSize,
       pageToken: this.nextPageToken,
       fields: `kind,nextPageToken,incompleteSearch,files(${FIELDS})`,
       orderBy: this.orderBy.join(","),
@@ -138,20 +139,5 @@ export class Query {
     }
 
     return list;
-  }
-
-  private async _getOAuth2Client(): Promise<OAuth2Client> {
-    if (!this[oAuth2ClientSymbol]) {
-      if (this.options.accessToken) {
-        const oAuth2Client = new OAuth2Client();
-        oAuth2Client.setCredentials({access_token: this.options.accessToken});
-        this[oAuth2ClientSymbol] = oAuth2Client;
-      } else {
-        const googleAuth = new GoogleAuth(this.options);
-        this[oAuth2ClientSymbol] = await googleAuth.getClient() as OAuth2Client;
-      }
-    }
-
-    return this[oAuth2ClientSymbol];
   }
 }
