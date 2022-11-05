@@ -27,9 +27,9 @@ The library is build with [Google Drive API v3](https://developers.google.com/dr
 
 # Usage
 ```typescript
-import {TsGooleDrive} from "ts-google-drive";
+import {TsGoogleDrive} from "ts-google-drive";
 import {google} from "googleapis";
-const tsGoogleDrive = new TsGooleDrive({keyFilename: "serviceAccount.json"});
+const tsGoogleDrive = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
 
 async function auth() {
   const drive1 = new TsGoogleDrive({keyFilename: "serviceAccount.json"});
