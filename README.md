@@ -10,8 +10,6 @@
 [github-action-url]: https://github.com/terence410/ts-google-drive/actions
 [codecov-image]: https://img.shields.io/codecov/c/github/terence410/ts-google-drive.svg?style=flat-square
 [codecov-url]: https://codecov.io/gh/terence410/ts-google-drive
-[david-image]: https://img.shields.io/david/terence410/ts-google-drive.svg?style=flat-square
-[david-url]: https://david-dm.org/terence410/ts-google-drive
 
 Manage Google Drive easily. Support create folders, upload files, download files, searching, etc..
 The library is build with [Google Drive API v3](https://developers.google.com/drive/api/v3/about-sdk).

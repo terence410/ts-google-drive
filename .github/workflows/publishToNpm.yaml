@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 18
           registry-url: https://registry.npmjs.org/
 
       # we run with npm install instead of npm ci to make sure the package can run with latest packages
